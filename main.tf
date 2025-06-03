@@ -6,10 +6,10 @@ variable "cidr" {
   default = "10.0.0.0/16"
 }
 
-resource "aws_key_pair" "example" {
-  key_name   = "MyEC2Key"
-  public_key = file("home/haelz/MyEC2Key.pub")
-}
+# resource "aws_key_pair" "example" {
+#   key_name   = "test-key"
+#   public_key = file("/home/haelz/.ssh/id_rsa")
+# }
 
 resource "aws_vpc" "myvpc" {
   cidr_block = var.cidr
@@ -75,15 +75,18 @@ resource "aws_security_group" "webSg" {
 resource "aws_instance" "server" {
   ami                    = "ami-084568db4383264d4"
   instance_type          = "t2.micro"
-  key_name               = aws_key_pair.example.key_name
+  key_name               = "MyEC2Key" #aws_key_pair.example.key_name
   vpc_security_group_ids = [aws_security_group.webSg.id]
   subnet_id              = aws_subnet.sub1.id
 
+  tags = {
+    Name = "MyWebServer"
+  }
 
   connection {
     type        = "ssh"
     user        = "ubuntu"
-    private_key = file("home/haelz/MyEC2Key.pub")
+    private_key = file("/home/haelz/MyEC2Key.pem")
     host        = self.public_ip
   }
 
