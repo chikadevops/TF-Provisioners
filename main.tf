@@ -97,12 +97,14 @@ resource "aws_instance" "server" {
 
   provisioner "remote-exec" {
     inline = [
-      "echo 'Helllo from remote server!'",
-      "sudo apt-get update -y",
-      "sudo apt-get install -y python3-pip",
+      "echo 'Hello from remote server!'",
+      "sudo apt update -y",
+      "sudo apt install -y python3-pip python3.12-venv",
       "cd /home/ubuntu",
-      "sudo pip3 install flask",
-      "sudo python3 /home/ubuntu/app.py &"
+      "python3 -m venv venv",
+      "venv/bin/pip install --upgrade pip",
+      "venv/bin/pip install flask",
+      "sudo nohup venv/bin/python app.py > app.log 2>&1 &" # This works but i had to ssh into the instance and run it manually
     ]
   }
 }
